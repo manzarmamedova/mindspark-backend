@@ -25,4 +25,14 @@ public class categoryController {
     public CategoryDto createCategory(@RequestBody CategoryDto dto) {
         return categoryService.createCategory(dto);
     }
+
+    @PutMapping("/{id}")
+    public CategoryDto updateCategory(@PathVariable Long id, @RequestBody CategoryDto dto) {
+        return categoryService.updateCategory(id, dto);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteCategory(@PathVariable Long id) {
+        categoryService.deleteCategory(id);
+    }
 }
