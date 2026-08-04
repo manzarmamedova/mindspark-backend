@@ -2,6 +2,7 @@ package com.mindspark.backend.controller;
 
 import com.mindspark.backend.dto.CardDto;
 import com.mindspark.backend.service.CardService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -56,7 +57,7 @@ public class CardController {
     // Create card
     @PostMapping
     public ResponseEntity<CardDto> createCard(
-            @RequestBody CardDto dto) {
+            @Valid  @RequestBody CardDto dto) {
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -68,7 +69,7 @@ public class CardController {
     @PutMapping("/{id}")
     public ResponseEntity<CardDto> updateCard(
             @PathVariable Long id,
-            @RequestBody CardDto dto) {
+            @Valid @RequestBody CardDto dto) {
 
         return ResponseEntity.ok(
                 cardService.updateCard(id, dto)
