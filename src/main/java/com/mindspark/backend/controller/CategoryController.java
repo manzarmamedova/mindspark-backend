@@ -10,7 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/categories")
-public class categoryController {
+public class CategoryController {
 
     @Autowired
     private CategoryService categoryService;
