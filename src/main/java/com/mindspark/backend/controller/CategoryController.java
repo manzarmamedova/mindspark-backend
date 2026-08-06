@@ -2,6 +2,7 @@ package com.mindspark.backend.controller;
 
 import com.mindspark.backend.dto.CategoryDto;
 import com.mindspark.backend.service.CategoryService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,9 +13,11 @@ import java.util.List;
 @RequestMapping("/api/categories")
 public class CategoryController {
 
-    @Autowired
-    private CategoryService categoryService;
+    private final CategoryService categoryService;
 
+    public CategoryController(CategoryService categoryService) {
+        this.categoryService = categoryService;
+    }
 
     @GetMapping
     public List<CategoryDto> getAllCategories() {
@@ -22,12 +25,12 @@ public class CategoryController {
     }
 
     @PostMapping
-    public CategoryDto createCategory(@RequestBody CategoryDto dto) {
+    public CategoryDto createCategory(@Valid @RequestBody CategoryDto dto) {
         return categoryService.createCategory(dto);
     }
 
     @PutMapping("/{id}")
-    public CategoryDto updateCategory(@PathVariable Long id, @RequestBody CategoryDto dto) {
+    public CategoryDto updateCategory(@PathVariable Long id,@Valid @RequestBody CategoryDto dto) {
         return categoryService.updateCategory(id, dto);
     }
 
