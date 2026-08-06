@@ -3,8 +3,8 @@ package com.mindspark.backend.service;
 
 import com.mindspark.backend.dto.CategoryDto;
 import com.mindspark.backend.entity.Category;
+import com.mindspark.backend.exception.CategoryNotFoundException;
 import com.mindspark.backend.repository.CategoryRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -13,16 +13,21 @@ import java.util.List;
 @Service
 public class CategoryService {
 
-    @Autowired
+
     private CategoryRepository categoryRepository;
-    public List<CategoryDto>getAllCategories() {
+    public CategoryService(CategoryRepository categoryRepository){
+        this.categoryRepository = categoryRepository;
+    }
+
+
+    public List<CategoryDto> getAllCategories() {
         return categoryRepository.findAll()
                 .stream()
-                .map(category->new CategoryDto(
+                .map(category -> new CategoryDto(
                         category.getId(),
                         category.getCategoryName(),
                         category.getIcon()
-                        ))
+                ))
                 .toList();
 
     }
@@ -41,25 +46,29 @@ public class CategoryService {
 
         return result;
     }
+
     public CategoryDto updateCategory(long id, CategoryDto dto) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Category not found with id: " + id));
+                .orElseThrow(() -> new CategoryNotFoundException("Category not found with id: " + id));
 
 
         category.setCategoryName(dto.getCategoryName());
         category.setIcon(dto.getIcon());
-      Category updated = categoryRepository.save(category);
+        Category updated = categoryRepository.save(category);
 
-      CategoryDto result = new CategoryDto();
-      result.setId(updated.getId());
-      result.setCategoryName(updated.getCategoryName());
-      result.setIcon(updated.getIcon());
-      return result;
+        CategoryDto result = new CategoryDto();
+        result.setId(updated.getId());
+        result.setCategoryName(updated.getCategoryName());
+        result.setIcon(updated.getIcon());
+        return result;
 
     }
 
     public void deleteCategory(long id) {
-        categoryRepository.deleteById(id);
-    }
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() ->
+                        new CategoryNotFoundException("Category not found with id: " + id));
 
+        categoryRepository.delete(category);
+    }
 }

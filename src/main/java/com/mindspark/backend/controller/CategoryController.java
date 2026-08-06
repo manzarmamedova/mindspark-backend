@@ -3,7 +3,7 @@ package com.mindspark.backend.controller;
 import com.mindspark.backend.dto.CategoryDto;
 import com.mindspark.backend.service.CategoryService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,7 +35,12 @@ public class CategoryController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteCategory(@PathVariable Long id) {
+    public ResponseEntity<String> deleteCategory(@PathVariable Long id) {
+
         categoryService.deleteCategory(id);
+
+        return ResponseEntity.ok(
+                "Category deleted successfully"
+        );
     }
 }

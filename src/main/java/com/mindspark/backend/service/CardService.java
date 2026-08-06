@@ -3,6 +3,8 @@ package com.mindspark.backend.service;
 import com.mindspark.backend.dto.CardDto;
 import com.mindspark.backend.entity.Card;
 import com.mindspark.backend.entity.Category;
+import com.mindspark.backend.exception.CardNotFoundException;
+import com.mindspark.backend.exception.CategoryNotFoundException;
 import com.mindspark.backend.repository.CardRepository;
 import com.mindspark.backend.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,12 @@ public class CardService {
 
     // Get cards by category
     public List<CardDto> getCardsByCategory(Long categoryId) {
+
+        categoryRepository.findById(categoryId)
+                .orElseThrow(() ->
+                        new CategoryNotFoundException(
+                                "Category not found with id: " + categoryId
+                        ));
 
         List<Card> cards = cardRepository.findByCategoryId(categoryId);
 
@@ -48,7 +56,7 @@ public class CardService {
 
         Card card = cardRepository.findById(id)
                 .orElseThrow(() ->
-                        new RuntimeException("Card not found with id: " + id));
+                        new CardNotFoundException("Card not found with id: " + id));
 
         return mapToDto(card);
     }
@@ -59,7 +67,7 @@ public class CardService {
 
         Category category = categoryRepository.findById(dto.getCategoryId())
                 .orElseThrow(() ->
-                        new RuntimeException(
+                        new CategoryNotFoundException(
                                 "Category not found with id: " + dto.getCategoryId()
                         ));
 
@@ -83,12 +91,12 @@ public class CardService {
 
         Card card = cardRepository.findById(id)
                 .orElseThrow(() ->
-                        new RuntimeException("Card not found with id: " + id));
+                        new CardNotFoundException("Card not found with id: " + id));
 
 
         Category category = categoryRepository.findById(dto.getCategoryId())
                 .orElseThrow(() ->
-                        new RuntimeException(
+                        new CategoryNotFoundException(
                                 "Category not found with id: " + dto.getCategoryId()
                         ));
 
@@ -112,7 +120,7 @@ public class CardService {
 
         Card card = cardRepository.findById(id)
                 .orElseThrow(() ->
-                        new RuntimeException("Card not found with id: " + id));
+                        new CardNotFoundException("Card not found with id: " + id));
 
         cardRepository.delete(card);
     }
