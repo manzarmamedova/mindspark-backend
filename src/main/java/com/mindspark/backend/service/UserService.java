@@ -4,6 +4,7 @@ import com.mindspark.backend.dto.UserDto;
 import com.mindspark.backend.entity.User;
 import com.mindspark.backend.exception.UserNotFoundException;
 import com.mindspark.backend.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,9 +14,12 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
 
-    public UserService(UserRepository userRepository) {
+
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
     }
 
@@ -27,7 +31,7 @@ public class UserService {
                         user.getId(),
                         user.getName(),
                         user.getEmail(),
-                        user.getPassword()
+                        null
                 ))
                 .toList();
     }
@@ -39,7 +43,8 @@ public class UserService {
 
         user.setName(dto.getName());
         user.setEmail(dto.getEmail());
-        user.setPassword(dto.getPassword());
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
+
 
 
         User savedUser = userRepository.save(user);
@@ -49,7 +54,7 @@ public class UserService {
                 savedUser.getId(),
                 savedUser.getName(),
                 savedUser.getEmail(),
-                savedUser.getPassword()
+                null
         );
     }
 
@@ -67,7 +72,7 @@ public class UserService {
                 user.getId(),
                 user.getName(),
                 user.getEmail(),
-                user.getPassword()
+                null
         );
     }
 
@@ -84,7 +89,7 @@ public class UserService {
 
         user.setName(dto.getName());
         user.setEmail(dto.getEmail());
-        user.setPassword(dto.getPassword());
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
 
 
         User updatedUser = userRepository.save(user);
@@ -94,7 +99,7 @@ public class UserService {
                 updatedUser.getId(),
                 updatedUser.getName(),
                 updatedUser.getEmail(),
-                updatedUser.getPassword()
+                null
         );
     }
 
