@@ -1,5 +1,6 @@
 package com.mindspark.backend.controller;
 
+import com.mindspark.backend.dto.LoginRequest;
 import com.mindspark.backend.dto.RegisterRequest;
 import com.mindspark.backend.dto.UserResponse;
 import com.mindspark.backend.service.AuthService;
@@ -25,5 +26,12 @@ public class AuthController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(authService.register(request));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(
+            @RequestBody LoginRequest request) {
+
+        return ResponseEntity.ok(authService.login(request));
     }
 }
