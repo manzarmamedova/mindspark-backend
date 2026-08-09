@@ -18,11 +18,15 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
 
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @Mock
     private UserRepository userRepository;
@@ -51,6 +55,8 @@ public class UserServiceTest {
         savedUser.setPassword("password123");
 
 
+        when(passwordEncoder.encode("password123"))
+                .thenReturn("hashedPassword");
         when(userRepository.save(any(User.class)))
                 .thenReturn(savedUser);
 
@@ -150,6 +156,8 @@ public class UserServiceTest {
                 .thenReturn(Optional.of(user));
 
 
+        when(passwordEncoder.encode("87654321"))
+                .thenReturn("hashedPassword");
         when(userRepository.save(any(User.class)))
                 .thenReturn(user);
 
