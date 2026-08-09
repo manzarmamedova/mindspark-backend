@@ -55,7 +55,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
 
         } catch (Exception e) {
-            // Geçersiz token ise authentication oluşturma
+
         }
 
         filterChain.doFilter(request, response);

@@ -2,6 +2,7 @@ package com.mindspark.backend.service;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -11,15 +12,15 @@ import java.util.Date;
 @Service
 public class JwtService {
 
-    private final String SECRET_KEY =
-            "mindspark-super-secret-key-for-jwt-2026";
+    @Value("${jwt.secret}")
+    private String secretKey;
 
-    private final long EXPIRATION_TIME =
-            1000 * 60 * 60;
+    @Value("${jwt.expiration}")
+    private long expirationTime;
 
     private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(
-                SECRET_KEY.getBytes(StandardCharsets.UTF_8)
+                secretKey.getBytes(StandardCharsets.UTF_8)
         );
     }
 
@@ -29,7 +30,7 @@ public class JwtService {
                 .subject(email)
                 .issuedAt(new Date())
                 .expiration(
-                        new Date(System.currentTimeMillis() + EXPIRATION_TIME)
+                        new Date(System.currentTimeMillis() + expirationTime)
                 )
                 .signWith(getSigningKey())
                 .compact();
