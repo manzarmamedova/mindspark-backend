@@ -14,8 +14,7 @@ import tools.jackson.databind.json.JsonMapper;
 
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
@@ -73,7 +72,8 @@ class CardControllerTest {
     void getCardById_shouldReturnCard_whenCardExists() throws Exception {
         CardDto card = new CardDto(1L, "Test Title", "Test description", "Test fun fact", "http://example.com/image.jpg", "http://example.com/source", 1L);
 
-        when(cardService.getCardById(1L)).thenReturn(card);
+        when(cardService.getCardById(eq(1L), isNull()))
+                .thenReturn(card);
 
         mockMvc.perform(get("/api/cards/1"))
                 .andExpect(status().isOk())
@@ -83,7 +83,7 @@ class CardControllerTest {
 
     @Test
     void getCardById_shouldReturnNotFound_whenCardDoesNotExist() throws Exception {
-        when(cardService.getCardById(99L))
+        when(cardService.getCardById(eq(99L), isNull()))
                 .thenThrow(new CardNotFoundException("Card not found with id: 99"));
 
         mockMvc.perform(get("/api/cards/99"))

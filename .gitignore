@@ -34,3 +34,4 @@ build/
 ### Extra ###
 .env
 *.log
+application-local.properties

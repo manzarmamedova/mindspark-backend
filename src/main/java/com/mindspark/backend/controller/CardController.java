@@ -5,6 +5,8 @@ import com.mindspark.backend.service.CardService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -46,13 +48,15 @@ public class CardController {
     // Get card by id
     @GetMapping("/{id}")
     public ResponseEntity<CardDto> getCardById(
-            @PathVariable Long id) {
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        String email = (userDetails != null) ? userDetails.getUsername() : null;
 
         return ResponseEntity.ok(
-                cardService.getCardById(id)
+                cardService.getCardById(id, email)
         );
     }
-
 
     // Create card
     @PostMapping

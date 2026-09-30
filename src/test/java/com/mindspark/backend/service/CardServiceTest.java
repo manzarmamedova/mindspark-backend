@@ -1,4 +1,5 @@
 package com.mindspark.backend.service;
+import com.mindspark.backend.config.CustomUserDetailsService;
 import com.mindspark.backend.dto.CardDto;
 import com.mindspark.backend.entity.Card;
 import com.mindspark.backend.entity.Category;
@@ -13,6 +14,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,8 +23,9 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 
-
+@AutoConfigureMockMvc(addFilters = false)
 @ExtendWith(MockitoExtension.class)
 public class CardServiceTest {
     @Mock
@@ -29,6 +33,15 @@ public class CardServiceTest {
 
     @Mock
     private CategoryRepository categoryRepository;
+
+    @Mock
+    private ReadHistoryService readHistoryService;
+
+    @MockitoBean
+    private JwtService jwtService;
+
+    @MockitoBean
+    private CustomUserDetailsService customUserDetailsService;
 
 
     @InjectMocks
@@ -132,7 +145,7 @@ public class CardServiceTest {
 
 
 
-        CardDto result = cardService.getCardById(1L);
+        CardDto result = cardService.getCardById(1L, null);
 
 
 
@@ -152,7 +165,7 @@ public class CardServiceTest {
 
         assertThrows(
                 CardNotFoundException.class,
-                () -> cardService.getCardById(99L)
+                () -> cardService.getCardById(99L, null)
         );
     }
 
@@ -262,6 +275,47 @@ public class CardServiceTest {
                 CategoryNotFoundException.class,
                 () -> cardService.createCard(dto)
         );
+    }
+
+    @Test
+    void getCardById_shouldMarkAsRead_whenEmailProvided() {
+
+        Category category = new Category();
+        category.setId(1L);
+
+        Card card = new Card();
+        card.setId(1L);
+        card.setTitle("Mars");
+        card.setCategory(category);
+
+        when(cardRepository.findById(1L))
+                .thenReturn(Optional.of(card));
+
+        cardService.getCardById(1L, "test@example.com");
+
+        verify(readHistoryService)
+                .markAsRead("test@example.com", 1L);
+    }
+
+
+    @Test
+    void getCardById_shouldNotMarkAsRead_whenEmailIsNull() {
+
+        Category category = new Category();
+        category.setId(1L);
+
+        Card card = new Card();
+        card.setId(1L);
+        card.setTitle("Mars");
+        card.setCategory(category);
+
+        when(cardRepository.findById(1L))
+                .thenReturn(Optional.of(card));
+
+        cardService.getCardById(1L, null);
+
+        verify(readHistoryService, never())
+                .markAsRead(any(), any());
     }
 }
 

@@ -16,11 +16,13 @@ public class CardService {
 
     private final CardRepository cardRepository;
     private final CategoryRepository categoryRepository;
+    private final ReadHistoryService readHistoryService;
 
     public CardService(CardRepository cardRepository,
-                       CategoryRepository categoryRepository) {
+                       CategoryRepository categoryRepository, ReadHistoryService readHistoryService) {
         this.cardRepository = cardRepository;
         this.categoryRepository = categoryRepository;
+        this.readHistoryService = readHistoryService;
     }
 
 
@@ -52,11 +54,15 @@ public class CardService {
 
 
     // Get card by id
-    public CardDto getCardById(Long id) {
+    public CardDto getCardById(Long id, String email) {
 
         Card card = cardRepository.findById(id)
                 .orElseThrow(() ->
                         new CardNotFoundException("Card not found with id: " + id));
+
+        if (email != null) {
+            readHistoryService.markAsRead(email, id);
+        }
 
         return mapToDto(card);
     }
