@@ -1,6 +1,8 @@
 package com.mindspark.backend.controller;
 
+import com.mindspark.backend.config.CustomUserDetailsService;
 import com.mindspark.backend.dto.UserDto;
+import com.mindspark.backend.service.JwtService;
 import com.mindspark.backend.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +19,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import org.springframework.security.test.context.support.WithMockUser;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 @WebMvcTest(UserController.class)
+@WithMockUser
 class UserControllerTest {
 
     @Autowired
@@ -29,6 +34,12 @@ class UserControllerTest {
 
     @MockitoBean
     private UserService userService;
+    @MockitoBean
+    private JwtService jwtService;
+
+    @MockitoBean
+
+    private CustomUserDetailsService customUserDetailsService;
 
     @Test
     void getAllUsers_shouldReturnUserList() throws Exception {
@@ -64,6 +75,7 @@ class UserControllerTest {
         when(userService.createUser(any(UserDto.class))).thenReturn(response);
 
         mockMvc.perform(post("/api/users")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -76,6 +88,7 @@ class UserControllerTest {
         UserDto invalidRequest = new UserDto(null, "Ali Veli", "not-an-email", "password123");
 
         mockMvc.perform(post("/api/users")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonMapper.writeValueAsString(invalidRequest)))
                 .andExpect(status().isBadRequest());
@@ -86,6 +99,7 @@ class UserControllerTest {
         UserDto invalidRequest = new UserDto(null, "Ali Veli", "ali@example.com", "short");
 
         mockMvc.perform(post("/api/users")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonMapper.writeValueAsString(invalidRequest)))
                 .andExpect(status().isBadRequest());
@@ -99,6 +113,7 @@ class UserControllerTest {
         when(userService.updateUser(eq(1L), any(UserDto.class))).thenReturn(response);
 
         mockMvc.perform(put("/api/users/1")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -107,7 +122,8 @@ class UserControllerTest {
 
     @Test
     void deleteUser_shouldReturnOk() throws Exception {
-        mockMvc.perform(delete("/api/users/1"))
+        mockMvc.perform(delete("/api/users/1")
+                .with(csrf()))
                 .andExpect(status().isOk());
     }
 }

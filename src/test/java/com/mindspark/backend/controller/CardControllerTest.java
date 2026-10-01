@@ -1,9 +1,11 @@
 package com.mindspark.backend.controller;
 
+import com.mindspark.backend.config.CustomUserDetailsService;
 import com.mindspark.backend.dto.CardDto;
 import com.mindspark.backend.exception.CardNotFoundException;
 import com.mindspark.backend.exception.CategoryNotFoundException;
 import com.mindspark.backend.service.CardService;
+import com.mindspark.backend.service.JwtService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -20,8 +22,12 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import org.springframework.security.test.context.support.WithMockUser;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+
 
 @WebMvcTest(CardController.class)
+@WithMockUser
 class CardControllerTest {
 
     @Autowired
@@ -32,6 +38,13 @@ class CardControllerTest {
 
     @MockitoBean
     private CardService cardService;
+
+    @MockitoBean
+    private JwtService jwtService;
+    @MockitoBean
+    private CustomUserDetailsService customUserDetailsService;
+
+
 
     @Test
     void getAllCards_shouldReturnCardList() throws Exception {
@@ -72,7 +85,7 @@ class CardControllerTest {
     void getCardById_shouldReturnCard_whenCardExists() throws Exception {
         CardDto card = new CardDto(1L, "Test Title", "Test description", "Test fun fact", "http://example.com/image.jpg", "http://example.com/source", 1L);
 
-        when(cardService.getCardById(eq(1L), isNull()))
+        when(cardService.getCardById(eq(1L),  any()))
                 .thenReturn(card);
 
         mockMvc.perform(get("/api/cards/1"))
@@ -83,7 +96,7 @@ class CardControllerTest {
 
     @Test
     void getCardById_shouldReturnNotFound_whenCardDoesNotExist() throws Exception {
-        when(cardService.getCardById(eq(99L), isNull()))
+        when(cardService.getCardById(eq(99L),  any()))
                 .thenThrow(new CardNotFoundException("Card not found with id: 99"));
 
         mockMvc.perform(get("/api/cards/99"))
@@ -98,6 +111,7 @@ class CardControllerTest {
         when(cardService.createCard(any(CardDto.class))).thenReturn(response);
 
         mockMvc.perform(post("/api/cards")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
@@ -110,6 +124,7 @@ class CardControllerTest {
         CardDto invalidRequest = new CardDto(null, "", "Test description", "Test fun fact", "http://example.com/image.jpg", "http://example.com/source", 1L);
 
         mockMvc.perform(post("/api/cards")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonMapper.writeValueAsString(invalidRequest)))
                 .andExpect(status().isBadRequest());
@@ -120,6 +135,7 @@ class CardControllerTest {
         CardDto invalidRequest = new CardDto(null, "Test Title", "Test description", "Test fun fact", "http://example.com/image.jpg", "http://example.com/source", null);
 
         mockMvc.perform(post("/api/cards")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonMapper.writeValueAsString(invalidRequest)))
                 .andExpect(status().isBadRequest());
@@ -133,6 +149,7 @@ class CardControllerTest {
                 .thenThrow(new CategoryNotFoundException("Category not found with id: 99"));
 
         mockMvc.perform(post("/api/cards")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonMapper.writeValueAsString(request)))
                 .andExpect(status().isNotFound());
@@ -146,6 +163,7 @@ class CardControllerTest {
         when(cardService.updateCard(eq(1L), any(CardDto.class))).thenReturn(response);
 
         mockMvc.perform(put("/api/cards/1")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -160,6 +178,7 @@ class CardControllerTest {
                 .thenThrow(new CardNotFoundException("Card not found with id: 99"));
 
         mockMvc.perform(put("/api/cards/99")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonMapper.writeValueAsString(request)))
                 .andExpect(status().isNotFound());
@@ -169,7 +188,8 @@ class CardControllerTest {
     void deleteCard_shouldReturnOk() throws Exception {
         doNothing().when(cardService).deleteCard(1L);
 
-        mockMvc.perform(delete("/api/cards/1"))
+        mockMvc.perform(delete("/api/cards/1")
+                .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Card deleted successfully"));
     }
@@ -179,7 +199,8 @@ class CardControllerTest {
         doThrow(new CardNotFoundException("Card not found with id: 99"))
                 .when(cardService).deleteCard(99L);
 
-        mockMvc.perform(delete("/api/cards/99"))
+        mockMvc.perform(delete("/api/cards/99")
+                .with(csrf()))
                 .andExpect(status().isNotFound());
     }
 }

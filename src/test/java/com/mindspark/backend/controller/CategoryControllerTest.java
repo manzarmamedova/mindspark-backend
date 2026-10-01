@@ -1,12 +1,15 @@
 package com.mindspark.backend.controller;
 
+import com.mindspark.backend.config.CustomUserDetailsService;
 import com.mindspark.backend.dto.CategoryDto;
 import com.mindspark.backend.exception.CategoryNotFoundException;
 import com.mindspark.backend.service.CategoryService;
+import com.mindspark.backend.service.JwtService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.json.JsonMapper;
@@ -20,8 +23,10 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 @WebMvcTest(CategoryController.class)
+@WithMockUser
 class CategoryControllerTest {
 
     @Autowired
@@ -32,6 +37,12 @@ class CategoryControllerTest {
 
     @MockitoBean
     private CategoryService categoryService;
+
+    @MockitoBean
+    private JwtService jwtService;
+
+    @MockitoBean
+    private CustomUserDetailsService customUserDetailsService;
 
     @Test
     void getAllCategories_shouldReturnCategoryList() throws Exception {
@@ -55,6 +66,7 @@ class CategoryControllerTest {
         when(categoryService.createCategory(any(CategoryDto.class))).thenReturn(response);
 
         mockMvc.perform(post("/api/categories")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -67,6 +79,7 @@ class CategoryControllerTest {
         CategoryDto invalidRequest = new CategoryDto(null, "", "🔬");
 
         mockMvc.perform(post("/api/categories")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonMapper.writeValueAsString(invalidRequest)))
                 .andExpect(status().isBadRequest());
@@ -80,6 +93,7 @@ class CategoryControllerTest {
         when(categoryService.updateCategory(eq(1L), any(CategoryDto.class))).thenReturn(response);
 
         mockMvc.perform(put("/api/categories/1")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -94,6 +108,7 @@ class CategoryControllerTest {
                 .thenThrow(new CategoryNotFoundException("Category not found with id: 99"));
 
         mockMvc.perform(put("/api/categories/99")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonMapper.writeValueAsString(request)))
                 .andExpect(status().isNotFound());
@@ -103,7 +118,8 @@ class CategoryControllerTest {
     void deleteCategory_shouldReturnOk() throws Exception {
         doNothing().when(categoryService).deleteCategory(1L);
 
-        mockMvc.perform(delete("/api/categories/1"))
+        mockMvc.perform(delete("/api/categories/1")
+                .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Category deleted successfully"));
     }
@@ -113,7 +129,8 @@ class CategoryControllerTest {
         doThrow(new CategoryNotFoundException("Category not found with id: 99"))
                 .when(categoryService).deleteCategory(99L);
 
-        mockMvc.perform(delete("/api/categories/99"))
+        mockMvc.perform(delete("/api/categories/99")
+                .with(csrf()))
                 .andExpect(status().isNotFound());
     }
 }
