@@ -24,5 +24,14 @@ public class ReadHistoryController {
         return ResponseEntity.ok(readHistoryService.getHistory(userDetails.getUsername()));
     }
 
+    @PostMapping("/{cardId}")
+    public ResponseEntity<Void> markAsRead(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long cardId
+    ) {
+        readHistoryService.markAsRead(userDetails.getUsername(), cardId);
+        return ResponseEntity.ok().build();
+    }
+
 
 }
