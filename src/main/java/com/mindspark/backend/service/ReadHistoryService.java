@@ -11,7 +11,9 @@ import com.mindspark.backend.repository.ReadHistoryRepository;
 import com.mindspark.backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ReadHistoryService {
@@ -39,19 +41,39 @@ public class ReadHistoryService {
     }
 
     public void markAsRead(String email, Long cardId) {
+
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException("User not found with email: " + email));
+                .orElseThrow(() -> new UserNotFoundException(
+                        "User not found with email: " + email
+                ));
 
         Card card = cardRepository.findById(cardId)
-                .orElseThrow(() -> new CardNotFoundException("Card not found with id: " + cardId));
+                .orElseThrow(() -> new CardNotFoundException(
+                        "Card not found with id: " + cardId
+                ));
 
-        ReadHistory readHistory = new ReadHistory();
-        readHistory.setUser(user);
-        readHistory.setCard(card);
+        Optional<ReadHistory> existingHistory =
+                readHistoryRepository.findByUserIdAndCardId(
+                        user.getId(),
+                        cardId
+                );
 
-        readHistoryRepository.save(readHistory);
+        if (existingHistory.isPresent()) {
+
+            ReadHistory history = existingHistory.get();
+            history.setReadAt(Instant.now());
+
+            readHistoryRepository.save(history);
+
+        } else {
+
+            ReadHistory readHistory = new ReadHistory();
+            readHistory.setUser(user);
+            readHistory.setCard(card);
+
+            readHistoryRepository.save(readHistory);
+        }
     }
-
     private CardDto mapToCardDto(Card card) {
         CardDto dto = new CardDto();
         dto.setId(card.getId());

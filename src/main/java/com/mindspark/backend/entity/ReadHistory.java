@@ -11,7 +11,14 @@ import java.time.Instant;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "read_history")
+@Table(
+        name = "read_history",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        columnNames = {"user_id", "card_id"}
+                )
+        }
+)
 public class ReadHistory {
 
     @Id
