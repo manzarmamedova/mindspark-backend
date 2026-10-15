@@ -81,6 +81,7 @@ public class CardService {
 
         card.setTitle(dto.getTitle());
         card.setDescription(dto.getDescription());
+        card.setContent(dto.getContent());
         card.setFunFact(dto.getFunFact());
         card.setImageUrl(dto.getImageUrl());
         card.setSourceUrl(dto.getSourceUrl());
@@ -109,6 +110,7 @@ public class CardService {
 
         card.setTitle(dto.getTitle());
         card.setDescription(dto.getDescription());
+        card.setContent(dto.getContent());
         card.setFunFact(dto.getFunFact());
         card.setImageUrl(dto.getImageUrl());
         card.setSourceUrl(dto.getSourceUrl());
@@ -141,6 +143,7 @@ public class CardService {
         dto.setId(card.getId());
         dto.setTitle(card.getTitle());
         dto.setDescription(card.getDescription());
+        dto.setContent(card.getContent());
         dto.setFunFact(card.getFunFact());
         dto.setImageUrl(card.getImageUrl());
         dto.setSourceUrl(card.getSourceUrl());

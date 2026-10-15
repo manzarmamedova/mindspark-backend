@@ -20,6 +20,8 @@ public class CardDto {
     @NotBlank(message = "Description cannot be empty")
     @Size(max = 500, message = "Description must be at most 500 characters")
     private String description;
+    private String content;
+
     @Size(max = 500, message = "Fun fact must be at most 500 characters")
     private String funFact;
     private String imageUrl;

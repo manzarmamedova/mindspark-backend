@@ -18,9 +18,14 @@ public class Card {
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long id;
 
+
+
     @Column(nullable=false)
     private String title;
 
+    @Column(columnDefinition = "TEXT")
+    private String content;
+    
     @Column(length = 500, nullable = false)
     private String description;
 
