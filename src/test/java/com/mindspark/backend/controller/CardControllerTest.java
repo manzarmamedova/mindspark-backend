@@ -48,8 +48,8 @@ class CardControllerTest {
 
     @Test
     void getAllCards_shouldReturnCardList() throws Exception {
-        CardDto card1 = new CardDto(1L, "Test Title One", "Test description one", "Test fun fact one", "http://example.com/image1.jpg", "http://example.com/source1", 1L);
-        CardDto card2 = new CardDto(2L, "Test Title Two", "Test description two", "Test fun fact two", "http://example.com/image2.jpg", "http://example.com/source2", 1L);
+        CardDto card1 = new CardDto(1L, "Test Title One", "Test description one", null, "Test fun fact one", "http://example.com/image1.jpg", "http://example.com/source1", 1L);
+        CardDto card2 = new CardDto(2L, "Test Title Two", "Test description two", "Test fun fact two", null, "http://example.com/image2.jpg", "http://example.com/source2", 1L);
 
         when(cardService.getAllCards()).thenReturn(List.of(card1, card2));
 
@@ -62,7 +62,7 @@ class CardControllerTest {
 
     @Test
     void getCardsByCategory_shouldReturnCardList() throws Exception {
-        CardDto card = new CardDto(1L, "Test Title", "Test description", "Test fun fact", "http://example.com/image.jpg", "http://example.com/source", 1L);
+        CardDto card = new CardDto(1L, "Test Title", "Test description", null, "Test fun fact", "http://example.com/image.jpg", "http://example.com/source", 1L);
 
         when(cardService.getCardsByCategory(1L)).thenReturn(List.of(card));
 
@@ -83,7 +83,7 @@ class CardControllerTest {
 
     @Test
     void getCardById_shouldReturnCard_whenCardExists() throws Exception {
-        CardDto card = new CardDto(1L, "Test Title", "Test description", "Test fun fact", "http://example.com/image.jpg", "http://example.com/source", 1L);
+        CardDto card = new CardDto(1L, "Test Title", "Test description",null, "Test fun fact", "http://example.com/image.jpg", "http://example.com/source", 1L);
 
         when(cardService.getCardById(eq(1L),  any()))
                 .thenReturn(card);
@@ -105,8 +105,8 @@ class CardControllerTest {
 
     @Test
     void createCard_shouldReturnCreatedCard_whenValidInput() throws Exception {
-        CardDto request = new CardDto(null, "Test Title", "Test description", "Test fun fact", "http://example.com/image.jpg", "http://example.com/source", 1L);
-        CardDto response = new CardDto(1L, "Test Title", "Test description", "Test fun fact", "http://example.com/image.jpg", "http://example.com/source", 1L);
+        CardDto request = new CardDto(null, "Test Title", "Test description",null, "Test fun fact", "http://example.com/image.jpg", "http://example.com/source", 1L);
+        CardDto response = new CardDto(1L, "Test Title", "Test description", null, "Test fun fact", "http://example.com/image.jpg", "http://example.com/source", 1L);
 
         when(cardService.createCard(any(CardDto.class))).thenReturn(response);
 
@@ -121,7 +121,7 @@ class CardControllerTest {
 
     @Test
     void createCard_shouldReturnBadRequest_whenTitleIsBlank() throws Exception {
-        CardDto invalidRequest = new CardDto(null, "", "Test description", "Test fun fact", "http://example.com/image.jpg", "http://example.com/source", 1L);
+        CardDto invalidRequest = new CardDto(null, "", "Test description",null, "Test fun fact", "http://example.com/image.jpg", "http://example.com/source", 1L);
 
         mockMvc.perform(post("/api/cards")
                         .with(csrf())
@@ -132,7 +132,7 @@ class CardControllerTest {
 
     @Test
     void createCard_shouldReturnBadRequest_whenCategoryIdIsNull() throws Exception {
-        CardDto invalidRequest = new CardDto(null, "Test Title", "Test description", "Test fun fact", "http://example.com/image.jpg", "http://example.com/source", null);
+        CardDto invalidRequest = new CardDto(null, "Test Title", "Test description", null, "Test fun fact", "http://example.com/image.jpg", "http://example.com/source", null);
 
         mockMvc.perform(post("/api/cards")
                         .with(csrf())
@@ -143,7 +143,7 @@ class CardControllerTest {
 
     @Test
     void createCard_shouldReturnNotFound_whenCategoryDoesNotExist() throws Exception {
-        CardDto request = new CardDto(null, "Test Title", "Test description", "Test fun fact", "http://example.com/image.jpg", "http://example.com/source", 99L);
+        CardDto request = new CardDto(null, "Test Title", "Test description", null, "Test fun fact", "http://example.com/image.jpg", "http://example.com/source", 99L);
 
         when(cardService.createCard(any(CardDto.class)))
                 .thenThrow(new CategoryNotFoundException("Category not found with id: 99"));
@@ -157,8 +157,8 @@ class CardControllerTest {
 
     @Test
     void updateCard_shouldReturnUpdatedCard() throws Exception {
-        CardDto request = new CardDto(null, "Updated Title", "Updated description", "Updated fun fact", "http://example.com/image.jpg", "http://example.com/source", 1L);
-        CardDto response = new CardDto(1L, "Updated Title", "Updated description", "Updated fun fact", "http://example.com/image.jpg", "http://example.com/source", 1L);
+        CardDto request = new CardDto(null, "Updated Title", "Updated description",null, "Updated fun fact", "http://example.com/image.jpg", "http://example.com/source", 1L);
+        CardDto response = new CardDto(1L, "Updated Title", "Updated description",null, "Updated fun fact", "http://example.com/image.jpg", "http://example.com/source", 1L);
 
         when(cardService.updateCard(eq(1L), any(CardDto.class))).thenReturn(response);
 
@@ -172,7 +172,7 @@ class CardControllerTest {
 
     @Test
     void updateCard_shouldReturnNotFound_whenCardDoesNotExist() throws Exception {
-        CardDto request = new CardDto(null, "Test Title", "Test description", "Test fun fact", "http://example.com/image.jpg", "http://example.com/source", 1L);
+        CardDto request = new CardDto(null, "Test Title", "Test description",null, "Test fun fact", "http://example.com/image.jpg", "http://example.com/source", 1L);
 
         when(cardService.updateCard(eq(99L), any(CardDto.class)))
                 .thenThrow(new CardNotFoundException("Card not found with id: 99"));

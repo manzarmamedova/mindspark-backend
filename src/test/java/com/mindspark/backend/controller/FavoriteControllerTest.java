@@ -43,6 +43,7 @@ class FavoriteControllerTest {
                 6L,
                 "Test Card",
                 "Test description",
+                "Test content",
                 "Test fun fact",
                 "http://example.com/image.jpg",
                 "http://example.com/source",
