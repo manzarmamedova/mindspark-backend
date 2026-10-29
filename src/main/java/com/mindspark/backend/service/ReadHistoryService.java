@@ -9,6 +9,7 @@ import com.mindspark.backend.exception.UserNotFoundException;
 import com.mindspark.backend.repository.CardRepository;
 import com.mindspark.backend.repository.ReadHistoryRepository;
 import com.mindspark.backend.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -73,6 +74,11 @@ public class ReadHistoryService {
 
             readHistoryRepository.save(readHistory);
         }
+    }
+
+    @Transactional
+    public void deleteHistoryByCardId(Long cardId) {
+        readHistoryRepository.deleteByCard_Id(cardId);
     }
     private CardDto mapToCardDto(Card card) {
         CardDto dto = new CardDto();

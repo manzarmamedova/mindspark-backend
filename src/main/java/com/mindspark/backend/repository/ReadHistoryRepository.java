@@ -10,4 +10,5 @@ public interface ReadHistoryRepository extends JpaRepository<ReadHistory, Long> 
     List<ReadHistory> findByUserIdOrderByReadAtDesc(Long userId);
 
     Optional<ReadHistory> findByUserIdAndCardId(Long userId, Long cardId);
+    void deleteByCard_Id(Long cardId);
 }

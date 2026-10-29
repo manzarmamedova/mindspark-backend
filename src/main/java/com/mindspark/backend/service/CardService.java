@@ -7,6 +7,7 @@ import com.mindspark.backend.exception.CardNotFoundException;
 import com.mindspark.backend.exception.CategoryNotFoundException;
 import com.mindspark.backend.repository.CardRepository;
 import com.mindspark.backend.repository.CategoryRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,12 +18,14 @@ public class CardService {
     private final CardRepository cardRepository;
     private final CategoryRepository categoryRepository;
     private final ReadHistoryService readHistoryService;
+    private final FavoriteService favoriteService;
 
     public CardService(CardRepository cardRepository,
-                       CategoryRepository categoryRepository, ReadHistoryService readHistoryService) {
+                       CategoryRepository categoryRepository, ReadHistoryService readHistoryService, FavoriteService favoriteService) {
         this.cardRepository = cardRepository;
         this.categoryRepository = categoryRepository;
         this.readHistoryService = readHistoryService;
+        this.favoriteService = favoriteService;
     }
 
 
@@ -123,12 +126,14 @@ public class CardService {
     }
 
 
-    // Delete card
+    @Transactional
     public void deleteCard(Long id) {
 
         Card card = cardRepository.findById(id)
                 .orElseThrow(() ->
                         new CardNotFoundException("Card not found with id: " + id));
+        favoriteService.deleteFavoritesByCardId(id);
+        readHistoryService.deleteHistoryByCardId(id);
 
         cardRepository.delete(card);
     }

@@ -9,6 +9,7 @@ import com.mindspark.backend.exception.UserNotFoundException;
 import com.mindspark.backend.repository.CardRepository;
 import com.mindspark.backend.repository.FavoriteRepository;
 import com.mindspark.backend.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -56,12 +57,16 @@ public class FavoriteService {
 
         favoriteRepository.save(favorite);
     }
-
+    @Transactional
     public void removeFavorite(String email, Long cardId) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("User not found with email: " + email));
 
         favoriteRepository.deleteByUserIdAndCardId(user.getId(), cardId);
+    }
+    @Transactional
+    public void deleteFavoritesByCardId(Long cardId) {
+        favoriteRepository.deleteByCard_Id(cardId);
     }
 
     private CardDto mapToCardDto(Card card) {
