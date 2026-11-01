@@ -33,5 +33,10 @@ public class User {
     @Size(min = 8)
     private String password;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role = Role.USER;
+
+
 
 }

@@ -3,6 +3,7 @@ package com.mindspark.backend.service;
 import com.mindspark.backend.dto.LoginRequest;
 import com.mindspark.backend.dto.RegisterRequest;
 import com.mindspark.backend.dto.UserResponse;
+import com.mindspark.backend.entity.Role;
 import com.mindspark.backend.entity.User;
 import com.mindspark.backend.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,6 +36,7 @@ public class AuthService {
         user.setName(request.getName());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setRole(Role.USER);
 
         User savedUser = userRepository.save(user);
 
